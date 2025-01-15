@@ -13,7 +13,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // パスワードの暗号化用
         return new BCryptPasswordEncoder();
     }
 
@@ -21,18 +20,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login").permitAll() // 特定のURLを認証不要に設定
-                        .anyRequest().authenticated() // それ以外のリクエストは認証が必要
+                        //.requestMatchers("/register", "/login").permitAll() // ログインページと登録ページは許可
+                        .requestMatchers("/login").permitAll() // /loginへのアクセスを許可
+                        .anyRequest().authenticated() // 他のページは認証が必要
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") // ログインページのURL
-                        .defaultSuccessUrl("/") // ログイン成功後のリダイレクト先
+                        .loginPage("/login") // ログインページ
+                        .defaultSuccessUrl("/home", true) // ログイン成功後にホームページへリダイレクト
                         .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll // ログアウトを全員許可
-                );
+                .logout(LogoutConfigurer::permitAll); // ログアウトを許可
 
         return http.build();
     }
 }
+
 
